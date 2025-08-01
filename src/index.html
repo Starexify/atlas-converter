@@ -1,18 +1,399 @@
-<!doctype html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon"
-        href="https://github.com/Starexify/starexify.github.io/blob/main/src/assets/images/icon.png?raw=true">
-    <title>F&B Projects Hub</title>
+    <link rel="icon" href="https://github.com/Starexify/starexify.github.io/blob/main/src/assets/images/icon.png?raw=true">
+    <title>Atlas Converter</title>
     <script type="module" src="ui.js" defer></script>
     <link href="./output.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .converter-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-section, .output-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-section:hover, .output-section:hover {
+            border-color: #4facfe;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "📝";
+            margin-right: 10px;
+        }
+
+        .output-section .section-title::before {
+            content: "⚡";
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="number"], input[type="text"] {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"] {
+            width: 150px;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button.copy-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+        }
+
+        .button.copy-btn:hover {
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #d63031;
+        }
+
+        .success {
+            background: #e6ffe6;
+            color: #00b894;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #00b894;
+        }
+
+        @media (max-width: 768px) {
+            .converter-section {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .control-group {
+                justify-content: space-between;
+            }
+
+            input[type="number"], input[type="text"] {
+                width: auto;
+                flex: 1;
+            }
+        }
+    </style>
 </head>
-
 <body>
+<div class="container">
+    <div class="header">
+        <h1>XML to libGDX Atlas Converter</h1>
+        <p>Convert TextureAtlas XML format to libGDX atlas format with ease</p>
+    </div>
 
+    <div class="main-content">
+        <div class="controls">
+            <div class="control-group">
+                <label for="atlasWidth">Atlas Width:</label>
+                <input type="number" id="atlasWidth" value="8190" min="1">
+            </div>
+            <div class="control-group">
+                <label for="atlasHeight">Atlas Height:</label>
+                <input type="number" id="atlasHeight" value="3451" min="1">
+            </div>
+            <div class="control-group">
+                <label for="format">Format:</label>
+                <select id="format">
+                    <option value="RGBA8888">RGBA8888</option>
+                    <option value="RGB888">RGB888</option>
+                    <option value="RGBA4444">RGBA4444</option>
+                    <option value="RGB565">RGB565</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="filter">Filter:</label>
+                <select id="filter">
+                    <option value="Nearest,Nearest">Nearest,Nearest</option>
+                    <option value="Linear,Linear">Linear,Linear</option>
+                    <option value="Linear,Nearest">Linear,Nearest</option>
+                    <option value="Nearest,Linear">Nearest,Linear</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="button" onclick="convertXML()">Convert XML to libGDX Atlas</button>
+
+        <div id="message"></div>
+
+        <div class="converter-section">
+            <div class="input-section">
+                <div class="section-title">XML Input</div>
+                <textarea id="xmlInput" placeholder="Paste your XML TextureAtlas here..."><?xml version="1.0" encoding="utf-8"?>
+                    <TextureAtlas imagePath="BOYFRIEND.png">
+    <SubTexture name="BF Dead confirm0000" x="2694" y="0" width="439" height="435" frameX="0" frameY="-64" frameWidth="439" frameHeight="499" />
+</TextureAtlas></textarea>
+            </div>
+
+            <div class="output-section">
+                <div class="section-title">libGDX Atlas Output</div>
+                <textarea id="atlasOutput" readonly placeholder="Converted atlas will appear here..."></textarea>
+                <button class="button copy-btn" onclick="copyOutput()" style="margin-top: 10px;">Copy Output</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showMessage(text, type = 'error') {
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = `<div class="${type}">${text}</div>`;
+        setTimeout(() => {
+            messageDiv.innerHTML = '';
+        }, 5000);
+    }
+
+    function convertXML() {
+        const xmlInput = document.getElementById('xmlInput').value;
+        const atlasWidth = document.getElementById('atlasWidth').value;
+        const atlasHeight = document.getElementById('atlasHeight').value;
+        const format = document.getElementById('format').value;
+        const filter = document.getElementById('filter').value;
+
+        if (!xmlInput.trim()) {
+            showMessage('Please enter XML content to convert.');
+            return;
+        }
+
+        try {
+            // Parse XML
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlInput, 'text/xml');
+
+            // Check for parsing errors
+            const parseError = xmlDoc.querySelector('parsererror');
+            if (parseError) {
+                throw new Error('Invalid XML format');
+            }
+
+            const textureAtlas = xmlDoc.querySelector('TextureAtlas');
+            if (!textureAtlas) {
+                throw new Error('No TextureAtlas element found');
+            }
+
+            const imagePath = textureAtlas.getAttribute('imagePath');
+            if (!imagePath) {
+                throw new Error('No imagePath attribute found in TextureAtlas');
+            }
+
+            const subTextures = xmlDoc.querySelectorAll('SubTexture');
+            if (subTextures.length === 0) {
+                throw new Error('No SubTexture elements found');
+            }
+
+            // Build libGDX atlas format
+            let atlasContent = `${imagePath}\n`;
+            atlasContent += `size: ${atlasWidth},${atlasHeight}\n`;
+            atlasContent += `format: ${format}\n`;
+            atlasContent += `filter: ${filter}\n`;
+            atlasContent += `repeat: none\n`;
+
+            subTextures.forEach(subTexture => {
+                const name = subTexture.getAttribute('name');
+                const x = parseInt(subTexture.getAttribute('x')) || 0;
+                const y = parseInt(subTexture.getAttribute('y')) || 0;
+                const width = parseInt(subTexture.getAttribute('width')) || 0;
+                const height = parseInt(subTexture.getAttribute('height')) || 0;
+                const frameX = parseInt(subTexture.getAttribute('frameX')) || 0;
+                const frameY = parseInt(subTexture.getAttribute('frameY')) || 0;
+                const frameWidth = parseInt(subTexture.getAttribute('frameWidth')) || width;
+                const frameHeight = parseInt(subTexture.getAttribute('frameHeight')) || height;
+
+                // Convert frameY to offset (libGDX uses positive offset, XML uses negative frameY)
+                const offsetX = Math.abs(frameX);
+                const offsetY = Math.abs(frameY);
+
+                atlasContent += `${name}\n`;
+                atlasContent += `  rotate: false\n`;
+                atlasContent += `  xy: ${x}, ${y}\n`;
+                atlasContent += `  size: ${width}, ${height}\n`;
+                atlasContent += `  orig: ${frameWidth}, ${frameHeight}\n`;
+                atlasContent += `  offset: ${offsetX}, ${offsetY}\n`;
+                atlasContent += `  index: -1\n`;
+            });
+
+            document.getElementById('atlasOutput').value = atlasContent;
+            showMessage('Conversion successful!', 'success');
+
+        } catch (error) {
+            showMessage(`Conversion failed: ${error.message}`);
+        }
+    }
+
+    function copyOutput() {
+        const output = document.getElementById('atlasOutput');
+        if (!output.value) {
+            showMessage('No output to copy. Please convert XML first.');
+            return;
+        }
+
+        output.select();
+        document.execCommand('copy');
+        showMessage('Output copied to clipboard!', 'success');
+    }
+
+    // Auto-convert on input change (with debounce)
+    let convertTimeout;
+    document.getElementById('xmlInput').addEventListener('input', () => {
+        clearTimeout(convertTimeout);
+        convertTimeout = setTimeout(convertXML, 500);
+    });
+
+    // Convert the example on load
+    window.addEventListener('load', convertXML);
+</script>
 </body>
-
 </html>
