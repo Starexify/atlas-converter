@@ -1,3 +1,5 @@
 # bun Stuff
 node_modules
-bun.lockb
+bun.lock
+package.json
+tsconfig.json

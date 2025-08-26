@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://github.com/Starexify/starexify.github.io/blob/main/src/assets/images/icon.png?raw=true">
+    <title>Atlas Converter</title>
+    <link href="./output.css" rel="stylesheet">
+</head>
+
+<body class="min-h-screen p-5 bg-gradient-to-br from-indigo-400 to-purple-600 font-sans">
+<div class="max-w-6xl mx-auto bg-white/95 rounded-2xl shadow-2xl overflow-hidden">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-br from-sky-400 to-cyan-400 text-white text-center p-8">
+        <h1 class="text-4xl font-bold drop-shadow-md mb-2">XML to libGDX Atlas Converter</h1>
+        <p class="opacity-90 text-lg">Convert TextureAtlas XML format to libGDX atlas format with ease</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="p-8">
+
+        <!-- Controls -->
+        <div class="flex flex-wrap gap-4 mb-6">
+            <div class="flex items-center gap-2">
+                <label for="atlasWidth" class="font-semibold text-gray-700">Atlas Width:</label>
+                <input type="number" id="atlasWidth" value="8190" min="1"
+                       class="w-24 px-3 py-2 border-2 border-gray-300 rounded-md focus:border-sky-400 focus:ring focus:ring-sky-200">
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="atlasHeight" class="font-semibold text-gray-700">Atlas Height:</label>
+                <input type="number" id="atlasHeight" value="3451" min="1"
+                       class="w-24 px-3 py-2 border-2 border-gray-300 rounded-md focus:border-sky-400 focus:ring focus:ring-sky-200">
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="format" class="font-semibold text-gray-700">Format:</label>
+                <select id="format"
+                        class="px-3 py-2 border-2 border-gray-300 rounded-md focus:border-sky-400 focus:ring focus:ring-sky-200">
+                    <option value="RGBA8888">RGBA8888</option>
+                    <option value="RGB888">RGB888</option>
+                    <option value="RGBA4444">RGBA4444</option>
+                    <option value="RGB565">RGB565</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="filter" class="font-semibold text-gray-700">Filter:</label>
+                <select id="filter"
+                        class="px-3 py-2 border-2 border-gray-300 rounded-md focus:border-sky-400 focus:ring focus:ring-sky-200">
+                    <option value="Nearest,Nearest">Nearest,Nearest</option>
+                    <option value="Linear,Linear">Linear,Linear</option>
+                    <option value="Linear,Nearest">Linear,Nearest</option>
+                    <option value="Nearest,Linear">Nearest,Linear</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Convert Button -->
+        <button onclick="convertXML()"
+                class="bg-gradient-to-br from-indigo-400 to-purple-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:translate-y-[-2px] hover:shadow-xl transition">
+            Convert XML to libGDX Atlas
+        </button>
+
+        <!-- Messages -->
+        <div id="message" class="my-4"></div>
+
+        <!-- Converter Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+
+            <!-- Input -->
+            <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-sky-400 transition">
+                <div class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                    📝 XML Input
+                </div>
+                <textarea id="xmlInput"
+                          class="w-full h-72 border-2 border-gray-300 rounded-md p-3 font-mono text-sm leading-snug focus:border-sky-400 focus:ring focus:ring-sky-200"
+                          placeholder="Paste your XML TextureAtlas here..."><?xml version="1.0" encoding="utf-8"?>
+                    <TextureAtlas imagePath="BOYFRIEND.png">
+    <SubTexture name="BF Dead confirm0000" x="2694" y="0" width="439" height="435" frameX="0" frameY="-64" frameWidth="439" frameHeight="499" />
+</TextureAtlas></textarea>
+            </div>
+
+            <!-- Output -->
+            <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-sky-400 transition">
+                <div class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                    ⚡ libGDX Atlas Output
+                </div>
+                <textarea id="atlasOutput" readonly
+                          class="w-full h-72 border-2 border-gray-300 rounded-md p-3 font-mono text-sm leading-snug focus:border-sky-400 focus:ring focus:ring-sky-200"
+                          placeholder="Converted atlas will appear here..."></textarea>
+                <button onclick="copyOutput()"
+                        class="mt-3 bg-gradient-to-br from-emerald-500 to-green-400 text-white font-semibold px-5 py-2 rounded-lg shadow-md hover:shadow-lg hover:translate-y-[-2px] transition">
+                    Copy Output
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function showMessage(text, type = 'error') {
+        const messageDiv = document.getElementById('message');
+        const base = "p-4 rounded-lg mb-3 border-l-4";
+        let classes = "";
+        if (type === "error") {
+            classes = "bg-red-100 text-red-700 border-red-500";
+        } else {
+            classes = "bg-green-100 text-green-700 border-green-500";
+        }
+        messageDiv.innerHTML = `<div class="${base} ${classes}">${text}</div>`;
+        setTimeout(() => { messageDiv.innerHTML = ''; }, 5000);
+    }
+
+    // (keeping your JS conversion logic the same)
+    function convertXML() {
+        const xmlInput = document.getElementById('xmlInput').value;
+        const atlasWidth = document.getElementById('atlasWidth').value;
+        const atlasHeight = document.getElementById('atlasHeight').value;
+        const format = document.getElementById('format').value;
+        const filter = document.getElementById('filter').value;
+
+        if (!xmlInput.trim()) {
+            showMessage('Please enter XML content to convert.');
+            return;
+        }
+
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlInput, 'text/xml');
+            const parseError = xmlDoc.querySelector('parsererror');
+            if (parseError) throw new Error('Invalid XML format');
+
+            const textureAtlas = xmlDoc.querySelector('TextureAtlas');
+            if (!textureAtlas) throw new Error('No TextureAtlas element found');
+
+            const imagePath = textureAtlas.getAttribute('imagePath');
+            if (!imagePath) throw new Error('No imagePath attribute found in TextureAtlas');
+
+            const subTextures = xmlDoc.querySelectorAll('SubTexture');
+            if (subTextures.length === 0) throw new Error('No SubTexture elements found');
+
+            let atlasContent = `${imagePath}\n`;
+            atlasContent += `size: ${atlasWidth},${atlasHeight}\n`;
+            atlasContent += `format: ${format}\n`;
+            atlasContent += `filter: ${filter}\n`;
+            atlasContent += `repeat: none\n`;
+
+            subTextures.forEach(st => {
+                const originalName = st.getAttribute('name');
+                const x = parseInt(st.getAttribute('x')) || 0;
+                const y = parseInt(st.getAttribute('y')) || 0;
+                const width = parseInt(st.getAttribute('width')) || 0;
+                const height = parseInt(st.getAttribute('height')) || 0;
+                const frameX = parseInt(st.getAttribute('frameX')) || 0;
+                const frameY = parseInt(st.getAttribute('frameY')) || 0;
+                const frameWidth = parseInt(st.getAttribute('frameWidth')) || width;
+                const frameHeight = parseInt(st.getAttribute('frameHeight')) || height;
+
+                const offsetX = Math.abs(frameX);
+                const offsetY = Math.abs(frameY);
+
+                let index = -1;
+                let baseName = originalName;
+                const match = originalName.match(/^(.*?)(\d+)$/);
+                if (match) {
+                    baseName = match[1];              // remove numeric suffix
+                    index = parseInt(match[2], 10);   // numeric part goes to index
+                }
+
+                atlasContent += `${baseName}\n`;
+                atlasContent += `  rotate: false\n`;
+                atlasContent += `  xy: ${x}, ${y}\n`;
+                atlasContent += `  size: ${width}, ${height}\n`;
+                atlasContent += `  orig: ${frameWidth}, ${frameHeight}\n`;
+                atlasContent += `  offset: ${offsetX}, ${offsetY}\n`;
+                atlasContent += `  index: ${index}\n`;
+            });
+
+            document.getElementById('atlasOutput').value = atlasContent;
+            showMessage('Conversion successful!', 'success');
+        } catch (e) {
+            showMessage(`Conversion failed: ${e.message}`);
+        }
+    }
+
+    function copyOutput() {
+        const output = document.getElementById('atlasOutput');
+        if (!output.value) {
+            showMessage('No output to copy. Please convert XML first.');
+            return;
+        }
+        output.select();
+        document.execCommand('copy');
+        showMessage('Output copied to clipboard!', 'success');
+    }
+
+    let convertTimeout;
+    document.getElementById('xmlInput').addEventListener('input', () => {
+        clearTimeout(convertTimeout);
+        convertTimeout = setTimeout(convertXML, 500);
+    });
+    window.addEventListener('load', convertXML);
+</script>
+</body>
+
+</html>
