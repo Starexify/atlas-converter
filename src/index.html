@@ -171,7 +171,7 @@
                 atlasContent += `  rotate: false\n`;
                 atlasContent += `  xy: ${x}, ${y}\n`;
                 atlasContent += `  size: ${width}, ${height}\n`;
-                atlasContent += `  orig: ${frameWidth}, ${frameHeight}\n`;
+                atlasContent += `  orig: ${frameWidth || width}, ${frameHeight || height}\n`;
                 atlasContent += `  offset: ${offsetX}, ${offsetY}\n`;
                 atlasContent += `  index: ${index}\n`;
             });
