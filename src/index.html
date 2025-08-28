@@ -161,7 +161,7 @@
 
                 let index = -1;
                 let baseName = originalName;
-                const match = originalName.match(/^(.*?)(\d+)$/);
+                const match = originalName.match(/^(.*?)(\d{4})$/);
                 if (match) {
                     baseName = match[1];              // remove numeric suffix
                     index = parseInt(match[2], 10);   // numeric part goes to index
