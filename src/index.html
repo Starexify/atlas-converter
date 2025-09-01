@@ -3,96 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://github.com/Starexify/starexify.github.io/blob/main/src/assets/images/icon.png?raw=true">
-    <title>Atlas Converter</title>
-    <link href="./output.css" rel="stylesheet">
+    <title>Sparrow to LibGDX Atlas Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        textarea {
+            height: 200px;
+            resize: vertical;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .convert-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .convert-btn:hover {
+            background: #45a049;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .output-section {
+            margin-top: 30px;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+    </style>
 </head>
+<body>
+<div class="container">
+    <h1>Sparrow to LibGDX Atlas Converter</h1>
 
-<body class="min-h-screen p-5 bg-gradient-to-br from-indigo-400 to-purple-600 font-sans">
-<div class="max-w-6xl mx-auto bg-white/95 rounded-2xl shadow-2xl overflow-hidden">
-
-    <!-- Header -->
-    <div class="bg-gradient-to-br from-sky-400 to-cyan-400 text-white text-center p-8">
-        <h1 class="text-4xl font-bold drop-shadow-md mb-2">XML to libGDX Atlas Converter</h1>
-        <p class="opacity-90 text-lg">Convert TextureAtlas XML format to libGDX atlas format with ease</p>
+    <div class="info">
+        <strong>Info:</strong> This converter handles negative frameX/frameY offsets by converting them to proper positive offsets in LibGDX format. Negative offsets indicate sprite content that extends outside the original frame bounds.
     </div>
 
-    <!-- Main Content -->
-    <div class="p-8">
-
-        <!-- Controls -->
-        <div class="flex flex-wrap gap-4 mb-6">
-            <div class="flex items-center gap-2">
-                <label for="atlasWidth" class="font-semibold text-gray-700">Atlas Width:</label>
-                <input type="number" id="atlasWidth" value="8190" min="1"
-                       class="w-24 px-3 py-2 border-2 border-gray-300 rounded-md focus:border-sky-400 focus:ring focus:ring-sky-200">
-            </div>
-            <div class="flex items-center gap-2">
-                <label for="atlasHeight" class="font-semibold text-gray-700">Atlas Height:</label>
-                <input type="number" id="atlasHeight" value="3451" min="1"
-                       class="w-24 px-3 py-2 border-2 border-gray-300 rounded-md focus:border-sky-400 focus:ring focus:ring-sky-200">
-            </div>
-            <div class="flex items-center gap-2">
-                <label for="format" class="font-semibold text-gray-700">Format:</label>
-                <select id="format"
-                        class="px-3 py-2 border-2 border-gray-300 rounded-md focus:border-sky-400 focus:ring focus:ring-sky-200">
-                    <option value="RGBA8888">RGBA8888</option>
-                    <option value="RGB888">RGB888</option>
-                    <option value="RGBA4444">RGBA4444</option>
-                    <option value="RGB565">RGB565</option>
-                </select>
-            </div>
-            <div class="flex items-center gap-2">
-                <label for="filter" class="font-semibold text-gray-700">Filter:</label>
-                <select id="filter"
-                        class="px-3 py-2 border-2 border-gray-300 rounded-md focus:border-sky-400 focus:ring focus:ring-sky-200">
-                    <option value="Nearest,Nearest">Nearest,Nearest</option>
-                    <option value="Linear,Linear">Linear,Linear</option>
-                    <option value="Linear,Nearest">Linear,Nearest</option>
-                    <option value="Nearest,Linear">Nearest,Linear</option>
-                </select>
-            </div>
+    <div class="controls">
+        <div class="input-group">
+            <label for="atlasWidth">Atlas Width:</label>
+            <input type="number" id="atlasWidth" value="2048" min="1">
         </div>
+        <div class="input-group">
+            <label for="atlasHeight">Atlas Height:</label>
+            <input type="number" id="atlasHeight" value="2048" min="1">
+        </div>
+        <div class="input-group">
+            <label for="format">Format:</label>
+            <select id="format">
+                <option value="RGBA8888">RGBA8888</option>
+                <option value="RGB888">RGB888</option>
+                <option value="RGBA4444">RGBA4444</option>
+                <option value="RGB565">RGB565</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="filter">Filter:</label>
+            <select id="filter">
+                <option value="Linear,Linear">Linear, Linear</option>
+                <option value="Nearest,Nearest">Nearest, Nearest</option>
+                <option value="MipMap,MipMap">MipMap, MipMap</option>
+            </select>
+        </div>
+    </div>
 
-        <!-- Convert Button -->
-        <button onclick="convertXML()"
-                class="bg-gradient-to-br from-indigo-400 to-purple-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:translate-y-[-2px] hover:shadow-xl transition">
-            Convert XML to libGDX Atlas
-        </button>
+    <div class="input-group">
+        <label for="xmlInput">Sparrow XML Atlas Content:</label>
+        <textarea id="xmlInput" placeholder="Paste your Sparrow XML atlas content here..."></textarea>
+    </div>
 
-        <!-- Messages -->
-        <div id="message" class="my-4"></div>
+    <button class="convert-btn" onclick="convertXML()">Convert to LibGDX Atlas</button>
 
-        <!-- Converter Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    <div id="message" class="message"></div>
 
-            <!-- Input -->
-            <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-sky-400 transition">
-                <div class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                    📝 XML Input
-                </div>
-                <textarea id="xmlInput"
-                          class="w-full h-72 border-2 border-gray-300 rounded-md p-3 font-mono text-sm leading-snug focus:border-sky-400 focus:ring focus:ring-sky-200"
-                          placeholder="Paste your XML TextureAtlas here..."><?xml version="1.0" encoding="utf-8"?>
-                    <TextureAtlas imagePath="BOYFRIEND.png">
-    <SubTexture name="BF Dead confirm0000" x="2694" y="0" width="439" height="435" frameX="0" frameY="-64" frameWidth="439" frameHeight="499" />
-</TextureAtlas></textarea>
-            </div>
-
-            <!-- Output -->
-            <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-sky-400 transition">
-                <div class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                    ⚡ libGDX Atlas Output
-                </div>
-                <textarea id="atlasOutput" readonly
-                          class="w-full h-72 border-2 border-gray-300 rounded-md p-3 font-mono text-sm leading-snug focus:border-sky-400 focus:ring focus:ring-sky-200"
-                          placeholder="Converted atlas will appear here..."></textarea>
-                <button onclick="copyOutput()"
-                        class="mt-3 bg-gradient-to-br from-emerald-500 to-green-400 text-white font-semibold px-5 py-2 rounded-lg shadow-md hover:shadow-lg hover:translate-y-[-2px] transition">
-                    Copy Output
-                </button>
-            </div>
-
+    <div class="output-section">
+        <div class="input-group">
+            <label for="atlasOutput">LibGDX Atlas Output:</label>
+            <textarea id="atlasOutput" readonly placeholder="Converted LibGDX atlas will appear here..."></textarea>
         </div>
     </div>
 </div>
@@ -100,18 +147,15 @@
 <script>
     function showMessage(text, type = 'error') {
         const messageDiv = document.getElementById('message');
-        const base = "p-4 rounded-lg mb-3 border-l-4";
-        let classes = "";
-        if (type === "error") {
-            classes = "bg-red-100 text-red-700 border-red-500";
-        } else {
-            classes = "bg-green-100 text-green-700 border-green-500";
-        }
-        messageDiv.innerHTML = `<div class="${base} ${classes}">${text}</div>`;
-        setTimeout(() => { messageDiv.innerHTML = ''; }, 5000);
+        messageDiv.textContent = text;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
     }
 
-    // (keeping your JS conversion logic the same)
     function convertXML() {
         const xmlInput = document.getElementById('xmlInput').value;
         const atlasWidth = document.getElementById('atlasWidth').value;
@@ -164,60 +208,43 @@
                     index = parseInt(match[2], 10);
                 }
 
-                // Calculate padded size if frameX/Y are negative
-                let paddedWidth = width;
-                let paddedHeight = height;
-                let offsetX = 0;
-                let offsetY = 0;
-
-                if (frameX < 0) {
-                    paddedWidth += -frameX;      // expand width
-                    offsetX = 0;
-                } else {
-                    offsetX = frameX;
-                }
-
-                if (frameY < 0) {
-                    paddedHeight += -frameY;     // expand height
-                    offsetY = 0;
-                } else {
-                    offsetY = frameY;
-                }
+                // Convert Sparrow offsets to LibGDX offsets
+                // In Sparrow: frameX/Y is offset of cropped content within original frame
+                // In LibGDX: offset is where cropped content should be positioned within orig frame
+                // Negative Sparrow frameX/Y means content was cropped from left/top
+                let offsetX = Math.abs(frameX);
+                let offsetY = Math.abs(frameY);
 
                 atlasContent += `${baseName}\n`;
                 atlasContent += `  rotate: false\n`;
                 atlasContent += `  xy: ${x}, ${y}\n`;
-                atlasContent += `  size: ${paddedWidth}, ${paddedHeight}\n`;
+                atlasContent += `  size: ${width}, ${height}\n`;
                 atlasContent += `  orig: ${frameWidth}, ${frameHeight}\n`;
                 atlasContent += `  offset: ${offsetX}, ${offsetY}\n`;
                 atlasContent += `  index: ${index}\n`;
             });
 
             document.getElementById('atlasOutput').value = atlasContent;
-            showMessage('Conversion successful!', 'success');
+            showMessage('Conversion successful! Copy the output to your .atlas file.', 'success');
         } catch (e) {
             showMessage(`Conversion failed: ${e.message}`);
         }
     }
 
-    function copyOutput() {
-        const output = document.getElementById('atlasOutput');
-        if (!output.value) {
-            showMessage('No output to copy. Please convert XML first.');
-            return;
-        }
-        output.select();
-        document.execCommand('copy');
-        showMessage('Output copied to clipboard!', 'success');
-    }
+    // Auto-fill example data for testing
+    document.addEventListener('DOMContentLoaded', function() {
+        const exampleXML = `<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="logoBumpin.png">
+    <SubTexture name="logo bumpin0000" x="0" y="0" width="894" height="670" frameX="-22" frameY="-16" frameWidth="939" frameHeight="703" />
+    <SubTexture name="logo bumpin0001" x="904" y="0" width="939" height="703" />
+    <SubTexture name="logo bumpin0002" x="904" y="0" width="939" height="703" />
+    <SubTexture name="logo bumpin0003" x="0" y="713" width="911" height="683" frameX="-14" frameY="-10" frameWidth="939" frameHeight="703" />
+    <SubTexture name="logo bumpin0004" x="0" y="713" width="911" height="683" frameX="-14" frameY="-10" frameWidth="939" frameHeight="703" />
+    <SubTexture name="logo bumpin0005" x="921" y="713" width="905" height="679" frameX="-17" frameY="-12" frameWidth="939" frameHeight="703" />
+</TextureAtlas>`;
 
-    let convertTimeout;
-    document.getElementById('xmlInput').addEventListener('input', () => {
-        clearTimeout(convertTimeout);
-        convertTimeout = setTimeout(convertXML, 500);
+        document.getElementById('xmlInput').value = exampleXML;
     });
-    window.addEventListener('load', convertXML);
 </script>
 </body>
-
 </html>
