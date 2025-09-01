@@ -156,22 +156,39 @@
                 const frameWidth = parseInt(st.getAttribute('frameWidth')) || width;
                 const frameHeight = parseInt(st.getAttribute('frameHeight')) || height;
 
-                const offsetX = Math.abs(frameX);
-                const offsetY = Math.abs(frameY);
-
                 let index = -1;
                 let baseName = originalName;
                 const match = originalName.match(/^(.*?)(\d{4})$/);
                 if (match) {
-                    baseName = match[1];              // remove numeric suffix
-                    index = parseInt(match[2], 10);   // numeric part goes to index
+                    baseName = match[1];
+                    index = parseInt(match[2], 10);
+                }
+
+                // Calculate padded size if frameX/Y are negative
+                let paddedWidth = width;
+                let paddedHeight = height;
+                let offsetX = 0;
+                let offsetY = 0;
+
+                if (frameX < 0) {
+                    paddedWidth += -frameX;      // expand width
+                    offsetX = 0;
+                } else {
+                    offsetX = frameX;
+                }
+
+                if (frameY < 0) {
+                    paddedHeight += -frameY;     // expand height
+                    offsetY = 0;
+                } else {
+                    offsetY = frameY;
                 }
 
                 atlasContent += `${baseName}\n`;
                 atlasContent += `  rotate: false\n`;
                 atlasContent += `  xy: ${x}, ${y}\n`;
-                atlasContent += `  size: ${width}, ${height}\n`;
-                atlasContent += `  orig: ${frameWidth || width}, ${frameHeight || height}\n`;
+                atlasContent += `  size: ${paddedWidth}, ${paddedHeight}\n`;
+                atlasContent += `  orig: ${frameWidth}, ${frameHeight}\n`;
                 atlasContent += `  offset: ${offsetX}, ${offsetY}\n`;
                 atlasContent += `  index: ${index}\n`;
             });
