@@ -209,11 +209,10 @@
                 }
 
                 // Convert Sparrow offsets to LibGDX offsets
-                // In Sparrow: frameX/Y is offset of cropped content within original frame
-                // In LibGDX: offset is where cropped content should be positioned within orig frame
-                // Negative Sparrow frameX/Y means content was cropped from left/top
-                let offsetX = Math.abs(frameX);
-                let offsetY = Math.abs(frameY);
+                // Negative frameX/Y means content is cropped from left/top
+                let offsetX = -frameX;
+                let offsetY = -frameY;
+
 
                 atlasContent += `${baseName}\n`;
                 atlasContent += `  rotate: false\n`;
