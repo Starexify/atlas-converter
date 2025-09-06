@@ -199,6 +199,7 @@
                 const frameY = parseInt(st.getAttribute('frameY')) || 0;
                 const frameWidth = parseInt(st.getAttribute('frameWidth')) || width;
                 const frameHeight = parseInt(st.getAttribute('frameHeight')) || height;
+                const rotated = st.getAttribute('rotated');
 
                 let index = -1;
                 let baseName = originalName;
@@ -206,20 +207,24 @@
                 if (match) {
                     baseName = match[1];
                     index = parseInt(match[2], 10);
+
                 }
+
+                const isRotated = rotated === "true";
+                const rotate = isRotated ? "true" : "false";
 
                 // Convert Sparrow offsets to LibGDX offsets
                 // Negative frameX/Y means content is cropped from left/top
-                let offsetX = -frameX;
-                let offsetY = -frameY;
-
+                let offsetX = frameX;
+                let offsetY = frameY;
 
                 atlasContent += `${baseName}\n`;
-                atlasContent += `  rotate: false\n`;
+                atlasContent += `  rotate: ${rotate}\n`;
                 atlasContent += `  xy: ${x}, ${y}\n`;
                 atlasContent += `  size: ${width}, ${height}\n`;
                 atlasContent += `  orig: ${frameWidth}, ${frameHeight}\n`;
                 atlasContent += `  offset: ${offsetX}, ${offsetY}\n`;
+                if (offsetX > 0 && offsetY > 0) atlasContent += `  offset: ${offsetX}, ${offsetY}\n`;
                 atlasContent += `  index: ${index}\n`;
             });
 
